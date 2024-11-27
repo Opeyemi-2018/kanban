@@ -1,7 +1,16 @@
-import { createContext } from "react";
+import { createContext, useState } from "react";
 
 export const GlobalData = createContext();
 
 export const GlobalContextProvider = ({ children }) => {
-  return <GlobalData.Provider value={{}}>{children}</GlobalData.Provider>;
+  const [isActiveUser, setIsActiveUser] = useState(null);
+
+  const getUser = (user) => {
+    setIsActiveUser(user);
+  };
+  return (
+    <GlobalData.Provider value={{ getUser, isActiveUser }}>
+      {children}
+    </GlobalData.Provider>
+  );
 };

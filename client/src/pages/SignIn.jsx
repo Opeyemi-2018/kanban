@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { IoIosArrowBack } from "react-icons/io";
 import { LiaTimesSolid } from "react-icons/lia";
 import { MdErrorOutline } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
+import { GlobalData } from "../context";
 
 const SignIn = () => {
+  const { getUser } = useContext(GlobalData);
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -36,16 +38,18 @@ const SignIn = () => {
         throw new Error(errorData.message || "something went wrong");
       }
       const data = await res.json();
-      if (data.success === false) {
-        setError(data.message);
-        setLoading(false);
+      if (data._id) {
+        getUser(data);
+        navigate("/dashboard");
+      } else {
+        setError("unable to retrieve data");
         setTimeout(() => setError(null), 3000);
-        return;
       }
-      navigate("/dashboard");
-      setLoading(false);
     } catch (error) {
       setError(error.message);
+      setTimeout(() => setError(null), 3000);
+    } finally {
+      setLoading(false);
     }
     setFormData({ email: "", password: "" });
   };

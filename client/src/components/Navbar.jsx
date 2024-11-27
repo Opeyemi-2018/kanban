@@ -1,8 +1,10 @@
-import { FaPlus } from "react-icons/fa6";
+import { useContext } from "react";
 
 import { LuKanban } from "react-icons/lu";
 import { Link } from "react-router-dom";
+import { GlobalData } from "../context";
 const Navbar = () => {
+  const { isActiveUser } = useContext(GlobalData);
   return (
     <div className="bg-[#2B2C37] w-full text-white fixed top-0 left-0 right-0 ">
       <div className="flex items-center justify-between p-4">
@@ -16,12 +18,12 @@ const Navbar = () => {
           Kanban{" "}
         </Link>
         <h1 className="text-3xl">marketing</h1>
-        <button className="text-white bg-purple-700 flex items-center gap-1 px-3 py-2 rounded-full">
-          <span>
-            <FaPlus />
-          </span>{" "}
-          add task
-        </button>
+
+        {isActiveUser ? (
+          <div>{isActiveUser.name}</div>
+        ) : (
+          <Link to={"/sign-in"}>Sign in</Link>
+        )}
       </div>
     </div>
   );

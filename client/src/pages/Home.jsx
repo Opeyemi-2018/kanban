@@ -1,8 +1,10 @@
 import { Link } from "react-router-dom";
 import { LuKanban } from "react-icons/lu";
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { GlobalData } from "../context";
 
 const Home = () => {
+  const { isActiveUser } = useContext(GlobalData);
   const [loading, setLoading] = useState(true);
   setTimeout(() => setLoading(false), 3000);
   return (
@@ -30,12 +32,23 @@ const Home = () => {
             <p className="text-3xl">
               streamline your task and improve productivity with kanban board
             </p>
-            <Link
-              to={"/sign-up"}
-              className="bg-purple-600 p-3 rounded-full transform transition-all ease-in-out duration-300 hover:scale-105 hover:shadow-lg hover:bg-purple-700"
-            >
-              Get Started
-            </Link>
+            {isActiveUser ? (
+              <>
+                <Link
+                  to={"/dashboard"}
+                  className="bg-purple-600 p-3 rounded-full transform transition-all ease-in-out duration-300 hover:scale-105 hover:shadow-lg hover:bg-purple-700"
+                >
+                  Dashboard
+                </Link>
+              </>
+            ) : (
+              <Link
+                to={"/sign-up"}
+                className="bg-purple-600 p-3 rounded-full transform transition-all ease-in-out duration-300 hover:scale-105 hover:shadow-lg hover:bg-purple-700"
+              >
+                Get Started
+              </Link>
+            )}
           </section>
         </>
       )}
