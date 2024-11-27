@@ -4,8 +4,8 @@ import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
 
 export const signUp = async (req, res, next) => {
-  const { name, email, password, isAdmin, isTeamMember } = req.body;
-  if (!name || !email || !password) {
+  const { name, email, password, image, isAdmin, isTeamMember } = req.body;
+  if (!name || !email || !password || !image) {
     return next(errorHandler("all fields are required", 400));
   }
   const existUser = await User.findOne({ email });
@@ -16,6 +16,7 @@ export const signUp = async (req, res, next) => {
   const newUser = new User({
     name,
     email,
+    image,
     isAdmin,
     isTeamMember,
     password: hashPassword,
@@ -61,4 +62,9 @@ export const signIn = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
+};
+
+export const signOut = async (req, res) => {
+  res.clearCookie("access_token");
+  res.status(200).json({ message: "you have successfully sign out" });
 };

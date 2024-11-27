@@ -4,7 +4,7 @@ import { useContext, useState } from "react";
 import { GlobalData } from "../context";
 
 const Home = () => {
-  const { isActiveUser } = useContext(GlobalData);
+  const { activeUser } = useContext(GlobalData);
   const [loading, setLoading] = useState(true);
   setTimeout(() => setLoading(false), 3000);
   return (
@@ -15,7 +15,7 @@ const Home = () => {
         </div>
       ) : (
         <>
-          <div className="max-w-4xl mx-auto pt-20">
+          <div className="max-w-4xl mx-auto pt-20 flex justify-between">
             <h1 className="flex items-center gap-2 text-3xl font-bold text-white  animate__animated animate__fadeIn animate__delay-1s">
               <span>
                 <LuKanban
@@ -25,6 +25,22 @@ const Home = () => {
               </span>{" "}
               Kanban{" "}
             </h1>
+            {activeUser ? (
+              <Link to={"/dashboard"}>
+                <img
+                  src={activeUser.image}
+                  className="rounded-full w-10 h-10 object-cover border-4 border-purple-600"
+                  alt=""
+                />{" "}
+              </Link>
+            ) : (
+              <Link
+                to={"/sign-up"}
+                className="bg-white p-2 text-gray-700 rounded-md"
+              >
+                sign up
+              </Link>
+            )}
           </div>
 
           <section className=" flex flex-col gap-5 items-center justify-center text-center px-6 pt-20 text-white animate__animated animate__fadeIn animate__delay-1s">
@@ -32,7 +48,7 @@ const Home = () => {
             <p className="text-3xl">
               streamline your task and improve productivity with kanban board
             </p>
-            {isActiveUser ? (
+            {activeUser ? (
               <>
                 <Link
                   to={"/dashboard"}

@@ -1,10 +1,9 @@
 import { useContext } from "react";
-
 import { LuKanban } from "react-icons/lu";
 import { Link } from "react-router-dom";
 import { GlobalData } from "../context";
 const Navbar = () => {
-  const { isActiveUser } = useContext(GlobalData);
+  const { activeUser } = useContext(GlobalData);
   return (
     <div className="bg-[#2B2C37] w-full text-white fixed top-0 left-0 right-0 ">
       <div className="flex items-center justify-between p-4">
@@ -17,13 +16,13 @@ const Navbar = () => {
           </span>{" "}
           Kanban{" "}
         </Link>
-        <h1 className="text-3xl">marketing</h1>
+        <h1></h1>
 
-        {isActiveUser ? (
-          <div>{isActiveUser.name}</div>
-        ) : (
-          <Link to={"/sign-in"}>Sign in</Link>
-        )}
+        <img
+          src={activeUser.image}
+          className="rounded-full w-10 h-10 object-cover border-4 border-purple-600"
+          alt=""
+        />
       </div>
     </div>
   );

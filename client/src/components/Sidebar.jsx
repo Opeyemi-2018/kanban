@@ -2,17 +2,18 @@ import { useContext, useEffect, useState } from "react";
 import Frontend from "./Frontend";
 import Backend from "./Backend";
 import Design from "./Design";
-import SignUp from "../pages/SignUp";
-import { Link } from "react-router-dom";
+import { PiSignOutThin } from "react-icons/pi";
+import { Link, useNavigate } from "react-router-dom";
 import { GlobalData } from "../context";
 import { IoIosArrowUp } from "react-icons/io";
 import { FaPlus } from "react-icons/fa6";
 
 const Sidebar = () => {
-  const { isActiveUser } = useContext(GlobalData);
-
+  const { activeUser, signOutUser } = useContext(GlobalData);
+  const navigate = useNavigate();
   const [dropDown, setDropDown] = useState(false);
   const [tab, setTab] = useState("");
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
@@ -26,6 +27,22 @@ const Sidebar = () => {
     setTab(selectedTab);
     const newUrl = `${location.pathname}?tab=${selectedTab}`;
     window.history.pushState({}, "", newUrl); // Update URL without reloading
+  };
+
+  const handleSignOut = async () => {
+    try {
+      const res = await fetch("/api/auth/signout");
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || "something went wrong");
+      }
+      const data = await res.json();
+      if (data.success === false) {
+        setError(data.message);
+      }
+      navigate("/");
+      signOutUser();
+    } catch (error) {}
   };
   return (
     <main>
@@ -86,9 +103,9 @@ const Sidebar = () => {
               </span>{" "}
               add task
             </button>
-            <h1 className="border-b-2 border-gray-500">
-              {isActiveUser ? (
-                <div>Welcome {isActiveUser.name}</div>
+            {/* <h1 className="border-b-2 border-gray-500">
+              {activeUser ? (
+                <div>Welcome {activeUser.name}</div>
               ) : (
                 <Link
                   to={"/sign-up"}
@@ -101,7 +118,16 @@ const Sidebar = () => {
                   Sign Up
                 </Link>
               )}
-            </h1>
+            </h1> */}
+            <button
+              onClick={handleSignOut}
+              className="bg-gray-600 flex items-center justify-center gap-4 text-white rounded-md p-2 mt-40"
+            >
+              <span>
+                <PiSignOutThin size={20} />
+              </span>{" "}
+              sign out{" "}
+            </button>
           </div>
         </div>
         <div className="p-5 flex-1">

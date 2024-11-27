@@ -1,13 +1,16 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import useApi from "../api";
-import { MdOutlineDone } from "react-icons/md";
+import { MdOutlineDriveFolderUpload } from "react-icons/md";
 import { Link, useNavigate } from "react-router-dom";
 import { IoIosArrowBack } from "react-icons/io";
-
 import { LiaTimesSolid } from "react-icons/lia";
 import { MdErrorOutline } from "react-icons/md";
+import FileBase from "react-file-base64";
+import { FaLongArrowAltRight } from "react-icons/fa";
 
 const SignUp = () => {
+  // const fileRef = useRef(null);
+  const navigate = useNavigate();
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -15,18 +18,23 @@ const SignUp = () => {
     email: "",
     password: "",
   });
-  const navigate = useNavigate();
-
   const handleChange = (e) => {
     const { id, value } = e.target;
-    setFormData({ ...formData, [id]: value });
+    const formatedValue =
+      id === "name" || id === "email" ? value.toLowerCase() : value;
+    setFormData({ ...formData, [id]: formatedValue });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       setLoading(true);
-      if (!formData.name || !formData.email || !formData.password) {
+      if (
+        !formData.name ||
+        !formData.email ||
+        !formData.password ||
+        !formData.image
+      ) {
         setError("all fields are required");
         setTimeout(() => setError(null), 3000);
         return;
@@ -60,8 +68,12 @@ const SignUp = () => {
     navigate(-1);
   };
 
+  // const handleUpload = () => {
+  //   fileRef.current.click();
+  // };
+
   return (
-    <div className="pt-20 px-3 max-w-xl mx-auto">
+    <div className="pt-10 px-3 max-w-xl mx-auto">
       <button
         className="py-6 flex items-end gap-2 text-gray-600"
         onClick={handleGoBack}
@@ -95,6 +107,38 @@ const SignUp = () => {
           onChange={handleChange}
           className="border w-full border-gray-500 rounded-md p-2  focus:outline-none"
         />
+        <div className="p-2  flex items-center justify-between ">
+          <div className=" p-2 flex items-center gap-2 text-gray-500 rounded-md">
+            {" "}
+            <span>
+              {" "}
+              <MdOutlineDriveFolderUpload size={20} />
+            </span>
+            <p>upload image</p>{" "}
+            <span>
+              <FaLongArrowAltRight size={20} />
+            </span>
+          </div>
+          <FileBase
+            type="file"
+            multiple={false}
+            onDone={({ base64 }) => setFormData({ ...formData, image: base64 })}
+          />
+        </div>
+        {/* <input
+          type="file"
+          ref={fileRef}
+          className="hidden"
+          onChange={handleFileChange}
+        /> */}
+        {/* <button
+          onClick={handleUpload}
+          type="button"
+          className="flex items-center gap-2
+        p-2 bg-[#2B2C37] text-white w-40 rounded-md"
+        >
+          upload image <MdOutlineDriveFolderUpload />
+        </button> */}
         <button
           disabled={loading}
           className="bg-[#2B2C37] p-2 rounded-md capitalize text-white"
@@ -110,7 +154,7 @@ const SignUp = () => {
       </p>
 
       {error && (
-        <p className="flex items-center gap-8 text-nowrap text-[15px] bg-red-100 text-red-600 rounded-md px-5 py-2">
+        <div className="flex items-center gap-8 text-nowrap text-[15px] bg-red-100 text-red-600 rounded-md px-5 py-2">
           <span className="flex items-center gap-2">
             <MdErrorOutline size={20} /> {error}
           </span>
@@ -121,7 +165,7 @@ const SignUp = () => {
               className="  cursor-pointer"
             />
           </div>
-        </p>
+        </div>
       )}
     </div>
   );
