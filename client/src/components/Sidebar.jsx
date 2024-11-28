@@ -7,6 +7,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { GlobalData } from "../context";
 import { IoIosArrowUp } from "react-icons/io";
 import { FaPlus } from "react-icons/fa6";
+import CreateTask from "./CreateTask";
 
 const Sidebar = () => {
   const { activeUser, signOutUser } = useContext(GlobalData);
@@ -97,28 +98,15 @@ const Sidebar = () => {
                 </div>
               )}
             </div>
-            <button className="text-white justify-center  bg-purple-700 flex items-center gap-2 px-3 py-2 rounded-full">
+            <button
+              onClick={() => handleTabClick("create-task")}
+              className="text-white justify-center  bg-purple-700 flex items-center gap-2 px-3 py-2 rounded-full"
+            >
               <span>
                 <FaPlus />
               </span>{" "}
               add task
             </button>
-            {/* <h1 className="border-b-2 border-gray-500">
-              {activeUser ? (
-                <div>Welcome {activeUser.name}</div>
-              ) : (
-                <Link
-                  to={"/sign-up"}
-                  className={`p-2 rounded-md  ${
-                    tab === "signin"
-                      ? "bg-purple-600 text-white"
-                      : "hover:bg-purple-600 hover:text-white"
-                  } transition-all ease-in-out duration-300`}
-                >
-                  Sign Up
-                </Link>
-              )}
-            </h1> */}
             <button
               onClick={handleSignOut}
               className="bg-gray-600 flex items-center justify-center gap-4 text-white rounded-md p-2 mt-40"
@@ -133,6 +121,7 @@ const Sidebar = () => {
         <div className="p-5 flex-1">
           {tab === "frontend" && <Frontend />}
           {tab === "backend" && <Backend />}
+          {tab === "create-task" && <CreateTask />}
         </div>
       </div>
     </main>

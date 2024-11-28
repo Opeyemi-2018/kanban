@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import mongoose from "mongoose";
 import authRoute from "./route/authRoute.js";
+import taskRoute from "./route/createTaskRoute.js";
 dotenv.config();
 
 const app = express();
@@ -24,6 +25,7 @@ mongoose.connect(process.env.MONGO_URL).then(() => {
 });
 
 app.use("/api/auth", authRoute);
+app.use("/api/task", taskRoute);
 
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;

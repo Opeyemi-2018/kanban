@@ -7,8 +7,9 @@ const Home = () => {
   const { activeUser } = useContext(GlobalData);
   const [loading, setLoading] = useState(true);
   setTimeout(() => setLoading(false), 3000);
+
   return (
-    <div className="h-screen bg-[#2B2C37]">
+    <div className="h-screen bg-[#2B2C37] px-3">
       {loading ? (
         <div className="flex flex-col min-h-screen items-center justify-center flex-grow">
           <div className="h-8 w-8 rounded-full animate-ping bg-white"></div>
@@ -45,7 +46,7 @@ const Home = () => {
 
           <section className=" flex flex-col gap-5 items-center justify-center text-center px-6 pt-20 text-white animate__animated animate__fadeIn animate__delay-1s">
             <h1 className="text-2xl">Organize your work with ease </h1>
-            <p className="text-3xl">
+            <p className="text-3xl" id="p">
               streamline your task and improve productivity with kanban board
             </p>
             {activeUser ? (
