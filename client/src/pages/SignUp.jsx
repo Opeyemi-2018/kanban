@@ -17,12 +17,19 @@ const SignUp = () => {
     name: "",
     email: "",
     password: "",
+    isTeamMember: false,
+    image: null,
   });
   const handleChange = (e) => {
-    const { id, value } = e.target;
+    const { id, value, checked, type } = e.target;
+
     const formatedValue =
-      id === "name" || id === "email" ? value.toLowerCase() : value;
-    setFormData({ ...formData, [id]: formatedValue });
+      type === "checkbox"
+        ? checked
+        : id === "name" || id === "email"
+        ? value.toLowerCase()
+        : value;
+    setFormData((prev) => ({ ...prev, [id]: formatedValue }));
   };
 
   const handleSubmit = async (e) => {
@@ -33,7 +40,8 @@ const SignUp = () => {
         !formData.name ||
         !formData.email ||
         !formData.password ||
-        !formData.image
+        !formData.image ||
+        !formData.isTeamMember
       ) {
         setError("all fields are required");
         setTimeout(() => setError(null), 3000);
@@ -59,9 +67,16 @@ const SignUp = () => {
       navigate("/sign-in");
     } catch (error) {
       setError(error.message);
+    } finally {
       setLoading(false);
     }
-    setFormData({ name: "", email: "", password: "" });
+    setFormData({
+      name: "",
+      email: "",
+      password: "",
+      image: null,
+      isTeamMember: false,
+    });
   };
 
   const handleGoBack = () => {
@@ -87,7 +102,7 @@ const SignUp = () => {
           type="text"
           id="name"
           placeholder="name"
-          value={formData.name}
+          value={formData.name || ""}
           onChange={handleChange}
           className="border w-full border-gray-500 rounded-md p-2  focus:outline-none"
         />
@@ -95,7 +110,7 @@ const SignUp = () => {
           type="email"
           id="email"
           placeholder="email"
-          value={formData.email}
+          value={formData.email || ""}
           onChange={handleChange}
           className="border w-full border-gray-500 rounded-md p-2 focus:outline-none"
         />
@@ -103,11 +118,21 @@ const SignUp = () => {
           type="password"
           id="password"
           placeholder="password"
-          value={formData.password}
+          value={formData.password || ""}
           onChange={handleChange}
           className="border w-full border-gray-500 rounded-md p-2  focus:outline-none"
         />
-        <div className="p-2  flex items-center justify-between ">
+        <div className="flex items-center gap-2">
+          <h1>Team member</h1>
+          <input
+            type="checkbox"
+            id="isTeamMember"
+            checked={formData.isTeamMember || false}
+            onChange={handleChange}
+            className="justify-items-end w-5 h-5"
+          />
+        </div>
+        <div className="py-1 px-2  flex items-center justify-between ">
           <div className=" p-2 flex items-center gap-2 text-gray-500 rounded-md">
             {" "}
             <span>

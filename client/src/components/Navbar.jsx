@@ -18,11 +18,13 @@ const Navbar = () => {
         </Link>
         <h1></h1>
 
-        <img
-          src={activeUser.image}
-          className="rounded-full w-10 h-10 object-cover border-4 border-purple-600"
-          alt=""
-        />
+        {activeUser && (
+          <img
+            src={activeUser.image}
+            className="rounded-full w-10 h-10 object-cover border-4 border-purple-600"
+            alt=""
+          />
+        )}
       </div>
     </div>
   );

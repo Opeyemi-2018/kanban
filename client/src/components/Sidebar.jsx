@@ -8,6 +8,7 @@ import { GlobalData } from "../context";
 import { IoIosArrowUp } from "react-icons/io";
 import { FaPlus } from "react-icons/fa6";
 import CreateTask from "./CreateTask";
+import { Task } from "../../../server/models/taskModel";
 
 const Sidebar = () => {
   const { activeUser, signOutUser } = useContext(GlobalData);
@@ -15,6 +16,8 @@ const Sidebar = () => {
   const [dropDown, setDropDown] = useState(false);
   const [tab, setTab] = useState("");
   const [error, setError] = useState(null);
+  const [tasks, setTasks] = useState([]);
+  console.log(tasks);
 
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
@@ -29,6 +32,25 @@ const Sidebar = () => {
     const newUrl = `${location.pathname}?tab=${selectedTab}`;
     window.history.pushState({}, "", newUrl); // Update URL without reloading
   };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await fetch("/api/task/tasks");
+        if (!res.ok) {
+          const errorData = await res.json();
+          throw new Error(errorData || "something went wrong");
+        }
+        const data = await res.json();
+        console.log(data);
+
+        setTasks(data);
+      } catch (error) {
+        console.log(error.message);
+      }
+    };
+    fetchData();
+  }, []);
 
   const handleSignOut = async () => {
     try {
@@ -51,62 +73,27 @@ const Sidebar = () => {
         <div className="bg-[#2B2C37] w-64 h-screen ">
           <div className=" flex flex-col gap-3 p-5 text-1xl text-gray-400">
             <div className="border-b-2 border-gray-500">
-              <h1
-                onClick={() => setDropDown(!dropDown)}
-                className="p-2 flex items-center gap-2"
-              >
-                All board{" "}
-                <IoIosArrowUp
-                  size={25}
-                  className={`${
-                    dropDown ? "rotate-0" : "rotate-180"
-                  }  duration-300`}
-                />
-              </h1>
-              {dropDown && (
-                <div className="pl-2 pb-1 flex flex-col gap-2">
-                  <h1
-                    className={`p-1 rounded-md ${
-                      tab === "backend"
-                        ? "bg-purple-600 text-white"
-                        : "hover:bg-purple-600 hover:text-white"
-                    } transition-all ease-in-out duration-300`}
-                    onClick={() => handleTabClick("backend")}
-                  >
-                    Backend Task
-                  </h1>
-                  <h1
-                    className={`p-1 rounded-md ${
-                      tab === "frontend"
-                        ? "bg-purple-600 text-white"
-                        : "hover:bg-purple-600 hover:text-white"
-                    } transition-all ease-in-out duration-300`}
-                    onClick={() => handleTabClick("frontend")}
-                  >
-                    Frontend Task
-                  </h1>
-                  <h1
-                    className={`p-1 rounded-md ${
-                      tab === "design"
-                        ? "bg-purple-600 text-white"
-                        : "hover:bg-purple-600 hover:text-white"
-                    } transition-all ease-in-out duration-300`}
-                    onClick={() => handleTabClick("design")}
-                  >
-                    UI/UX Task
-                  </h1>
-                </div>
-              )}
+              <h1 className="py-2 flex items-center gap-2">All board</h1>
+              {tasks.map((task) => {
+                const { category } = task;
+                return (
+                  <div key={task._id} className="px-3 py-1">
+                    <button> {category}</button>
+                  </div>
+                );
+              })}
             </div>
-            <button
-              onClick={() => handleTabClick("create-task")}
-              className="text-white justify-center  bg-purple-700 flex items-center gap-2 px-3 py-2 rounded-full"
-            >
-              <span>
-                <FaPlus />
-              </span>{" "}
-              add task
-            </button>
+            {activeUser && activeUser.isAdmin && (
+              <button
+                onClick={() => handleTabClick("create-task")}
+                className="text-white justify-center  bg-purple-700 flex items-center gap-2 px-3 py-2 rounded-full"
+              >
+                <span>
+                  <FaPlus />
+                </span>{" "}
+                add task
+              </button>
+            )}
             <button
               onClick={handleSignOut}
               className="bg-gray-600 flex items-center justify-center gap-4 text-white rounded-md p-2 mt-40"
@@ -119,9 +106,11 @@ const Sidebar = () => {
           </div>
         </div>
         <div className="p-5 flex-1">
-          {tab === "frontend" && <Frontend />}
-          {tab === "backend" && <Backend />}
+          {/* {tab === "frontend" && <Frontend />}
+          {tab === "backend" && <Backend />} */}
+
           {tab === "create-task" && <CreateTask />}
+          {tab === "tasks" && <Task />}
         </div>
       </div>
     </main>

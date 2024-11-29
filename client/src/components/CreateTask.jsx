@@ -12,7 +12,7 @@ const CreateTask = () => {
     description: "",
     title: "",
     assignedTo: "",
-    subtasks: [""],
+    subtasks: [],
     category: "",
   });
 
@@ -60,13 +60,20 @@ const CreateTask = () => {
         const errorData = await res.json();
         throw new Error(errorData?.message || "something went wrong");
       } else {
-        navigate("/");
+        navigate("/dashboard");
       }
     } catch (error) {
       setError(error.message);
     } finally {
       setLoading(false);
     }
+    setFormData({
+      description: "",
+      title: "",
+      assignedTo: "",
+      category: "",
+      subtasks: [],
+    });
   };
   return (
     <div className="max-w-xl mx-auto pt-10 px-3">
@@ -80,7 +87,7 @@ const CreateTask = () => {
             onChange={handleChange}
             placeholder="enter task name"
             required
-            className="w-full border p-2 rounded mb-4 focus:outline-none"
+            className="w-full border border-gray-500 p-2 rounded mb-4 focus:outline-none"
           />
         </div>
         <div>
@@ -91,7 +98,7 @@ const CreateTask = () => {
             required
             value={formData.description}
             onChange={handleChange}
-            className="w-full border p-2 rounded mb-4 focus:outline-none"
+            className="w-full border p-2 rounded border-gray-500 mb-4 focus:outline-none"
           ></textarea>
         </div>
 
@@ -107,7 +114,7 @@ const CreateTask = () => {
                 type="text"
                 value={subtask}
                 onChange={(e) => handleSubtaskChange(index, e.target.value)}
-                className="w-full border p-2 rounded focus:outline-none"
+                className="w-full border p-2 border-gray-500 rounded focus:outline-none"
               />{" "}
               <button
                 type="button"
@@ -122,7 +129,7 @@ const CreateTask = () => {
           <button
             type="button"
             onClick={addSubtask}
-            className="bg-gray-600 text-white py-1 px-2 mb-2 rounded-md "
+            className="bg-gray-600 border-gray-500 text-white py-1 px-2 mb-2 rounded-md "
           >
             + Add Subtask
           </button>
@@ -133,7 +140,7 @@ const CreateTask = () => {
           placeholder="Category"
           value={formData.category}
           onChange={handleChange}
-          className="w-full border p-2 rounded mb-4 focus:outline-none"
+          className="w-full border p-2 border-gray-500 rounded mb-4 focus:outline-none"
         />
         <input
           type="email"
@@ -141,7 +148,7 @@ const CreateTask = () => {
           placeholder="Assignee Email"
           value={formData.assignedTo}
           onChange={handleChange}
-          className="w-full border p-2 rounded mb-4 focus:outline-none"
+          className="w-full border p-2 border-gray-500 rounded mb-4 focus:outline-none"
           required
         />
         <div className="flex justify-end gap-4">

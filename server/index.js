@@ -8,6 +8,9 @@ import taskRoute from "./route/createTaskRoute.js";
 dotenv.config();
 
 const app = express();
+app.use(express.json({ limit: "10mb" })); // Adjust the size as per your requirement
+app.use(express.urlencoded({ limit: "10mb", extended: true }));
+
 app.use(express.json());
 app.use(cookieParser());
 

@@ -26,10 +26,19 @@ export const createTask = async (req, res, next) => {
       from: process.env.EMAIL_USER,
       to: assignedTo,
       subject: "New task assign",
-      text: `You have been assigned a new task: "${title}".\n\nDescription: ${description}\n\nClick the link below to view the task:\n${process.env.FRONTEND_URL}/tasks/${task._id}`,
+      text: `You have been assigned a new task: "${title}".\n\nDescription: ${description}\n\nTo start working on this task, please sign up on our homepage:\n${process.env.FRONTEND_URL}/signup\n\nOnce you sign up, you will be able to access and manage your tasks.\n\nBest regards,\nThe Task Management Team`,
     };
     await transporter.sendMail(mailOption);
-    res.status(201).json(newTask);
+    res.status(201).json({ message: "task successfully created", newTask });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getTask = async (req, res, next) => {
+  try {
+    const task = await Task.find();
+    res.status(200).json(task);
   } catch (error) {
     next(error);
   }
