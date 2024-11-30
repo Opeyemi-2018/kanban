@@ -5,6 +5,7 @@ import SignUp from "./pages/SignUp";
 import SignIn from "./pages/SignIn";
 import "animate.css";
 import Dashboard from "./pages/Dashboard";
+import CreateTask from "./pages/CreateTask";
 const App = () => {
   return (
     <GlobalContextProvider>
@@ -14,6 +15,7 @@ const App = () => {
           <Route path="/sign-up" element={<SignUp />} />
           <Route path="/sign-in" element={<SignIn />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/create-task" element={<CreateTask />} />
         </Routes>
       </BrowserRouter>
     </GlobalContextProvider>

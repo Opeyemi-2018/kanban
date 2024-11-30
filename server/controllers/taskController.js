@@ -43,3 +43,16 @@ export const getTask = async (req, res, next) => {
     next(error);
   }
 };
+
+export const getTaskInfo = async (req, res, next) => {
+  const { id } = req.param;
+  try {
+    const taskInfo = await Task.findById(id);
+    if (!taskInfo) {
+      return next(errorHandler("info not found", 404));
+    }
+    res.status(200).json(taskInfo);
+  } catch (error) {
+    next(error);
+  }
+};

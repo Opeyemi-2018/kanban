@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import { IoIosArrowBack } from "react-icons/io";
 import { LiaTimesSolid } from "react-icons/lia";
 import { MdErrorOutline } from "react-icons/md";
 
@@ -23,16 +23,25 @@ const CreateTask = () => {
 
   const handleSubtaskChange = (index, value) => {
     const updatedSubtasks = [...formData.subtasks];
-    updatedSubtasks[index] = value;
+    updatedSubtasks[index].name = value;
     setFormData({ ...formData, subtasks: updatedSubtasks });
   };
 
   const addSubtask = () => {
-    setFormData({ ...formData, subtasks: [...formData.subtasks, ""] });
+    setFormData({
+      ...formData,
+      subtasks: [...formData.subtasks, { name: "", completed: false }], // Add new subtask
+    });
   };
 
   const removeSubtask = (index) => {
     const updatedSubtasks = formData.subtasks.filter((_, i) => i !== index);
+    setFormData({ ...formData, subtasks: updatedSubtasks });
+  };
+
+  const toggleSubtaskCompleted = (index) => {
+    const updatedSubtasks = [...formData.subtasks];
+    updatedSubtasks[index].completed = !updatedSubtasks[index].completed;
     setFormData({ ...formData, subtasks: updatedSubtasks });
   };
 
@@ -44,7 +53,7 @@ const CreateTask = () => {
       setTimeout(() => setError(null), 3000);
       return;
     }
-    if (!subtasks.every((subtask) => subtask.trim())) {
+    if (!subtasks.every((subtask) => subtask.name.trim())) {
       setError("Subtasks cannot be empty.");
       setTimeout(() => setError(null), 3000);
       return;
@@ -75,8 +84,17 @@ const CreateTask = () => {
       subtasks: [],
     });
   };
+  const handleGoBack = () => {
+    navigate(-1);
+  };
   return (
-    <div className="max-w-xl mx-auto pt-10 px-3">
+    <div className="max-w-xl mx-auto pX-5 pt-10    rounded-md ">
+      <button
+        className="py-6 flex items-end gap-2 text-gray-600"
+        onClick={handleGoBack}
+      >
+        <IoIosArrowBack size={25} /> Go back
+      </button>
       <form onSubmit={handleSubmit}>
         <div>
           <label>Title</label>
@@ -87,7 +105,7 @@ const CreateTask = () => {
             onChange={handleChange}
             placeholder="enter task name"
             required
-            className="w-full border border-gray-500 p-2 rounded mb-4 focus:outline-none"
+            className="w-full text-gray-700 border border-gray-500 p-2 rounded mb-4 focus:outline-none"
           />
         </div>
         <div>
@@ -98,7 +116,7 @@ const CreateTask = () => {
             required
             value={formData.description}
             onChange={handleChange}
-            className="w-full border p-2 rounded border-gray-500 mb-4 focus:outline-none"
+            className="w-full text-gray-700 border p-2 rounded border-gray-500 mb-4 focus:outline-none"
           ></textarea>
         </div>
 
@@ -112,10 +130,16 @@ const CreateTask = () => {
             >
               <input
                 type="text"
-                value={subtask}
-                onChange={(e) => handleSubtaskChange(index, e.target.value)}
-                className="w-full border p-2 border-gray-500 rounded focus:outline-none"
+                value={subtask.name}
+                onChange={(e) => handleSubtaskChange(index, e.target.value)} // Update subtask name
+                className="w-full text-gray-700 border p-2 border-gray-500 rounded focus:outline-none"
               />{" "}
+              <input
+                type="checkbox"
+                checked={subtask.completed}
+                onChange={() => toggleSubtaskCompleted(index)} // Toggle subtask completion
+                className="cursor-pointer hidden"
+              />
               <button
                 type="button"
                 onClick={() => removeSubtask(index)}
@@ -140,7 +164,7 @@ const CreateTask = () => {
           placeholder="Category"
           value={formData.category}
           onChange={handleChange}
-          className="w-full border p-2 border-gray-500 rounded mb-4 focus:outline-none"
+          className="w-full border text-gray-700 p-2 border-gray-500 rounded mb-4 focus:outline-none"
         />
         <input
           type="email"
@@ -148,7 +172,7 @@ const CreateTask = () => {
           placeholder="Assignee Email"
           value={formData.assignedTo}
           onChange={handleChange}
-          className="w-full border p-2 border-gray-500 rounded mb-4 focus:outline-none"
+          className="w-full text-gray-700 border p-2 border-gray-500 rounded mb-4 focus:outline-none"
           required
         />
         <div className="flex justify-end gap-4">
