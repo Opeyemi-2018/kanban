@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useContext } from "react";
 import { GlobalData } from "../context";
+import { LiaTimesSolid } from "react-icons/lia";
 
-const TaskDetailsModal = ({ task, onclose, onUpdateStatus }) => {
-  console.log(task.status);
-
+const TaskDetailsModal = ({ task, onclose, onUpdateStatus, onDelete }) => {
   const [subtasks, setSubtasks] = useState(task.subtasks);
   const [status, setStatus] = useState(task.status);
   const [error, setError] = useState(null);
@@ -23,28 +22,79 @@ const TaskDetailsModal = ({ task, onclose, onUpdateStatus }) => {
     setSubtasks(updateSubtasks);
   };
 
-  const handleStatusChange = (event) => {
+  const handleStatusChange = async (event) => {
     const newStatus = event.target.value;
 
     if (newStatus === "doing" && !canMoveToDoing) {
-      setError("You must complete at least one subtask to move to 'Doing'.");
+      setError(
+        "assignee You must complete at least one subtask to move to 'Doing'."
+      );
       setTimeout(() => setError(null), 3000);
       return;
     }
 
     if (newStatus === "done" && !canMoveToDone) {
-      setError("You must complete all subtasks to move to 'Done'.");
+      setError("assignee You must complete all subtasks to move to 'Done'.");
       setTimeout(() => setError(null), 3000);
       return;
     }
 
     setStatus(newStatus);
-    onUpdateStatus(task.id, newStatus, subtasks); // Notify the parent component or backend
+
+    try {
+      const response = await fetch(
+        `/api/task/tasks/update-status/${task._id}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            status: newStatus,
+            subtasks: subtasks,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to update task status");
+      }
+
+      const updatedTask = await response.json();
+
+      onUpdateStatus(task._id, updatedTask.status, updatedTask.subtasks); // Pass task._id here
+    } catch (error) {
+      setError(error.message);
+      setTimeout(() => setError(null), 3000);
+    }
+  };
+
+  const handleDelete = async () => {
+    const res = await fetch(`/api/task/delete-tasks/${task._id}`, {
+      method: "DELETE",
+      credentials: "include",
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json();
+      setError(errorData.message || "Something went wrong");
+      setTimeout(() => setError(null), 3000);
+      return;
+    }
+
+    // Call the onDelete prop to remove the task from the task list in the parent component
+    onDelete(task._id);
   };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
       <div className="bg-[#2B2C37] p-6 rounded-lg w-3/4 md:w-1/2 lg:w-1/3">
+        <LiaTimesSolid
+          size={30}
+          onClick={onclose}
+          className=" text-white float-right "
+        />
+
         <h2 className="text-xl mb-4 font-bold text-white">{task.title}</h2>
         <p className="text-gray-400 mb-4">{task.description}</p>
         <div className="mb-4">
@@ -77,16 +127,18 @@ const TaskDetailsModal = ({ task, onclose, onUpdateStatus }) => {
             onChange={handleStatusChange}
             className="bg-[#1E1F28] text-white px-4 py-2 rounded-md w-full"
           >
-            <option value="doing">Doing</option>
-            <option value="done">Done</option>
+            <option value="todo">Todo</option>
+            {activeUser.isTeamMember && <option value="doing">Doing</option>}
+            {activeUser.isAdmin && <option value="done">Done</option>}
           </select>
         </div>
         <button
-          onClick={onclose}
-          className="mt-4 px-4 py-2 bg-purple-700 text-white rounded-md"
+          onClick={handleDelete}
+          className="text-white bg-red-600 p-2 rounded-md capitalize w-full"
         >
-          Close
+          delete
         </button>
+
         {error && (
           <p className="text-red-600 bg-red-200 p-2 rounded-md">{error}</p>
         )}
