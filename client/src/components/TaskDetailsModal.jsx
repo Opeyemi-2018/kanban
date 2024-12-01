@@ -103,14 +103,14 @@ const TaskDetailsModal = ({ task, onclose, onUpdateStatus, onDelete }) => {
         />
 
         <h2 className="text-xl mb-4 font-bold text-white">{task.title}</h2>
-        <p className="text-gray-400 mb-4">{task.description}</p>
+        <p className="text-gray-300 mb-4">{task.description}</p>
         <div className="mb-4">
           <h3 className="text-white text-lg font-semibold">Subtask</h3>
           <ul>
             {subtasks.map((subtask, index) => (
               <li
                 key={index}
-                className={`text-gray-400 flex items-center gap-2 bg-[#0e122b] p-1 mb-2  rounded-md ${
+                className={`text-gray-300 flex items-center gap-2 bg-[#0e122b] p-1 mb-2  rounded-md ${
                   subtask.completed ? "line-through" : ""
                 }`}
               >
@@ -150,19 +150,21 @@ const TaskDetailsModal = ({ task, onclose, onUpdateStatus, onDelete }) => {
 
         {isDeleting && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-            <div className="bg-gray-800 p-4 rounded-md text-white w-[300px]">
+            <div className="bg-white p-6 rounded-md w-96 shadow-lg">
               {" "}
-              <p>Are you sure you want to delete this task?</p>
+              <h2 className="text-xl font-semibold text-gray-800 mb-4">
+                Are you sure you want to delete this task?
+              </h2>
               <div className="flex justify-between mt-4">
                 <button
                   onClick={handleDelete}
-                  className="bg-red-600 p-2 rounded-md w-1/4"
+                  className="bg-red-600 text-white py-2 px-4 rounded-md"
                 >
                   Yes
                 </button>
                 <button
                   onClick={cancelDelete}
-                  className="bg-white p-2 text-black rounded-md w-1/4"
+                  className="bg-gray-300 text-gray-800 py-2 px-4 rounded-md"
                 >
                   No
                 </button>

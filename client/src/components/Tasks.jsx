@@ -7,9 +7,15 @@ import { GlobalData } from "../context";
 const Tasks = ({ tasks = [], loading }) => {
   const { activeUser } = useContext(GlobalData);
   const [selectedTask, setSelectedTask] = useState(null);
+  const [error, setError] = useState(null);
 
   const handleTaskClick = (task) => {
-    setSelectedTask(task);
+    if (activeUser.isAdmin || task.assignedTo === activeUser.email) {
+      setSelectedTask(task);
+    } else {
+      setError("You are not authorized to view this task.");
+      setTimeout(() => setError(null), 3000);
+    }
   };
 
   const closeModal = () => {
@@ -57,7 +63,7 @@ const Tasks = ({ tasks = [], loading }) => {
                 </div>
                 <div>
                   <h1 className="font-semibold ">{task.title}</h1>
-                  <p className="text-gray-400">
+                  <p className="text-gray-300">
                     {task.subtasks.length} subtasks
                   </p>
                 </div>
@@ -65,7 +71,7 @@ const Tasks = ({ tasks = [], loading }) => {
               <div className="flex flex-col">
                 {/* Handle assignedTo as a string */}
                 {task.assignedTo ? (
-                  <p className="text-gray-400">
+                  <p className="text-gray-300">
                     {task.status === "done" ? (
                       <p className="text-white flex flex-col">
                         Done by{" "}
@@ -83,7 +89,7 @@ const Tasks = ({ tasks = [], loading }) => {
                     )}
                   </p>
                 ) : (
-                  <p className="text-gray-500">No assignee</p>
+                  <p className="text-gray-300">No assignee</p>
                 )}
               </div>
             </div>
@@ -101,6 +107,11 @@ const Tasks = ({ tasks = [], loading }) => {
           onclose={closeModal}
           onDelete={handleDeleteTask}
         />
+      )}
+      {error && (
+        <div className="text-red-500 bg-red-100 py-2 px-4 rounded-md fixed  transform -translate-y-1/2 -translate-x-1/2 top-1/2 left-1/2">
+          <p className="text-center">{error}</p>
+        </div>
       )}
     </div>
   );

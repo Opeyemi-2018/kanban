@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { GlobalData } from "../context";
 import { FaPlus } from "react-icons/fa6";
 import Task from "./Tasks";
+import Users from "./Users";
 
 const Sidebar = () => {
   const { activeUser, signOutUser } = useContext(GlobalData);
@@ -58,6 +59,9 @@ const Sidebar = () => {
   const filteredTasks = selectedCategory
     ? tasks.filter((task) => task.category === selectedCategory)
     : tasks;
+  const uniqueCategories = Array.from(
+    new Set(tasks.map((task) => task.category))
+  );
   return (
     <main>
       <div className="flex  gap-6 pt-16">
@@ -70,17 +74,13 @@ const Sidebar = () => {
               >
                 All board
               </button>
-              {tasks.map((task) => {
-                const { category } = task;
-                return (
-                  <div key={task._id} className="px-3 py-1">
-                    <button onClick={() => handleCategoryClick(category)}>
-                      {" "}
-                      {category}
-                    </button>
-                  </div>
-                );
-              })}
+              {uniqueCategories.map((category) => (
+                <div key={category} className="px-3 py-1">
+                  <button onClick={() => handleCategoryClick(category)}>
+                    {category}
+                  </button>
+                </div>
+              ))}
             </div>
             {activeUser && activeUser.isAdmin && (
               <Link
@@ -104,8 +104,11 @@ const Sidebar = () => {
             </button>
           </div>
         </div>
-        <div className="w-[600px]">
+        <div className="w-[600px] pt-10">
           <Task tasks={filteredTasks} loading={loading} />
+        </div>
+        <div className="pt-10 w-[400px]">
+          <Users />
         </div>
       </div>
     </main>
