@@ -19,6 +19,9 @@ export const createTask = async (req, res, next) => {
       assignedTo,
     });
     const transporter = nodemailer.createTransport({
+      host: "smtp.gmail.com",
+      port: 587,
+      secure: false,
       service: "gmail",
       auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
     });
@@ -37,7 +40,7 @@ export const createTask = async (req, res, next) => {
 
 export const getTask = async (req, res, next) => {
   try {
-    const task = await Task.find();
+    const task = await Task.find().populate("assignedTo", "name email").exec();
     res.status(200).json(task);
   } catch (error) {
     next(error);
@@ -53,6 +56,45 @@ export const getTaskInfo = async (req, res, next) => {
     }
     res.status(200).json(taskInfo);
   } catch (error) {
+    next(error);
+  }
+};
+
+export const updateStatus = async (req, res, next) => {
+  try {
+    const { taskid } = req.params;
+    const { status, subtasks } = req.body;
+    const task = await Task.findById(taskid);
+    if (!task) {
+      return next(errorHandler("task not found", 404));
+    }
+    task.status = status;
+    task.subtasks = subtasks;
+    await task.save();
+    res.status(200).json(task);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteTask = async (req, res, next) => {
+  const { taskId } = req.params;
+
+  try {
+    const task = await Task.findById(taskId);
+    if (!task) {
+      return next(errorHandler("Task notfound task", 404));
+    }
+
+    if (req.user.isAdmin) {
+      await Task.findByIdAndDelete(taskId);
+      return res.status(200).json({ message: "task successfully deleted" });
+    } else {
+      return next(errorHandler("you are not permitted", 403));
+    }
+  } catch (error) {
+    console.log(error);
+
     next(error);
   }
 };

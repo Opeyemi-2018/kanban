@@ -7,6 +7,13 @@ const TaskDetailsModal = ({ task, onclose, onUpdateStatus, onDelete }) => {
   const [status, setStatus] = useState(task.status);
   const [error, setError] = useState(null);
   const { activeUser } = useContext(GlobalData);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const confirmDelete = () => {
+    setIsDeleting(true);
+  };
+  const cancelDelete = () => {
+    setIsDeleting(false);
+  };
   useEffect(() => {
     setSubtasks(task.subtasks);
     setStatus(task.status);
@@ -129,15 +136,40 @@ const TaskDetailsModal = ({ task, onclose, onUpdateStatus, onDelete }) => {
           >
             <option value="todo">Todo</option>
             {activeUser.isTeamMember && <option value="doing">Doing</option>}
-            {activeUser.isAdmin && <option value="done">Done</option>}
+            {activeUser.isTeamMember && <option value="done">Done</option>}
           </select>
         </div>
-        <button
-          onClick={handleDelete}
-          className="text-white bg-red-600 p-2 rounded-md capitalize w-full"
-        >
-          delete
-        </button>
+        {activeUser.isAdmin && (
+          <button
+            onClick={confirmDelete}
+            className="text-white bg-red-600 p-2 rounded-md capitalize w-full"
+          >
+            delete
+          </button>
+        )}
+
+        {isDeleting && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+            <div className="bg-gray-800 p-4 rounded-md text-white w-[300px]">
+              {" "}
+              <p>Are you sure you want to delete this task?</p>
+              <div className="flex justify-between mt-4">
+                <button
+                  onClick={handleDelete}
+                  className="bg-red-600 p-2 rounded-md w-1/4"
+                >
+                  Yes
+                </button>
+                <button
+                  onClick={cancelDelete}
+                  className="bg-white p-2 text-black rounded-md w-1/4"
+                >
+                  No
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {error && (
           <p className="text-red-600 bg-red-200 p-2 rounded-md">{error}</p>

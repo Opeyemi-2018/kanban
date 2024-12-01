@@ -104,8 +104,9 @@ const Sidebar = () => {
             </button>
           </div>
         </div>
-
-        <Task tasks={filteredTasks} loading={loading} />
+        <div className="w-[600px]">
+          <Task tasks={filteredTasks} loading={loading} />
+        </div>
       </div>
     </main>
   );
