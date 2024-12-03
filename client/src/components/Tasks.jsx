@@ -1,13 +1,14 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import TaskDetailsModal from "./TaskDetailsModal";
 import { MdOutlineDone } from "react-icons/md";
 import { MdOutlinePending } from "react-icons/md";
 import { GlobalData } from "../context";
 
-const Tasks = ({ tasks = [], loading }) => {
+const Tasks = ({ tasks = [], loading, setTasks }) => {
   const { activeUser } = useContext(GlobalData);
   const [selectedTask, setSelectedTask] = useState(null);
   const [error, setError] = useState(null);
+  const [statusFilter, setStatusFilter] = useState("");
 
   const handleTaskClick = (task) => {
     if (activeUser.isAdmin || task.assignedTo === activeUser.email) {
@@ -33,21 +34,68 @@ const Tasks = ({ tasks = [], loading }) => {
     setTasks(updatedTasks);
   };
 
+  useEffect(() => {
+    const storedFilter = localStorage.getItem("taskStatusFilter");
+    if (storedFilter) {
+      setStatusFilter(storedFilter);
+    }
+  }, []);
+
+  const filteredTasks = tasks.filter((task) => {
+    if (statusFilter === "") return true; // Show all tasks
+    return task.status === statusFilter;
+  });
+
+  const isTaskOverdue = (dueDate) => {
+    return new Date(dueDate) < new Date() && dueDate !== null;
+  };
+
   return (
     <div>
+      {tasks.length > 0 && (
+        <div className="flex space-x-4 mb-4 items-center mt-4">
+          <h1>filtered by: </h1>
+          <button
+            onClick={() => setStatusFilter("todo")}
+            className="px-4 py-1 bg-gray-300 text-red-600 rounded"
+          >
+            Pending
+          </button>
+          <button
+            onClick={() => setStatusFilter("done")}
+            className="px-4 py-1 bg-gray-300 text-green-500 rounded"
+          >
+            Done
+          </button>
+          <button
+            onClick={() => setStatusFilter("")}
+            className="px-4 py-1 bg-gray-200 text-gray-800 rounded"
+          >
+            All
+          </button>
+        </div>
+      )}
       {loading ? (
         <div className="fixed top-1/2 left-1/2 transform -translate-y-1/2 -translate-x-1/2">
           <div className="flex flex-col min-h-screen items-center justify-center flex-grow">
             <div className="h-8 w-8 rounded-full animate-ping bg-[#2B2C37]"></div>
           </div>
         </div>
-      ) : tasks.length > 0 ? (
-        tasks.map((task) => {
+      ) : filteredTasks.length > 0 ? (
+        filteredTasks.map((task) => {
+          const overdue = isTaskOverdue(task.dueDate);
+          const taskBgClass =
+            task.status === "done"
+              ? "bg-[#2B2C37]" // No change when done
+              : overdue
+              ? "bg-red-600 animate-pulse" // Red fading effect when overdue
+              : "bg-[#2B2C37]"; // Default background
+
           return (
             <div
               onClick={() => handleTaskClick(task)}
               key={task._id}
-              className="bg-[#2B2C37] py-3 px-5 flex  justify-between cursor-pointer rounded-md text-white my-3 "
+              className={`py-3 px-5 flex justify-between cursor-pointer rounded-md text-white my-3 ${taskBgClass}`}
             >
               <div className="flex items-center gap-10">
                 <div>
@@ -67,11 +115,14 @@ const Tasks = ({ tasks = [], loading }) => {
                     {task.subtasks.length} subtasks
                   </p>
                 </div>
+              </div>{" "}
+              <div className="flex flex-col">
+                <p>created on </p>
+                <h1>{new Date(task.createdAt).toLocaleDateString()}</h1>
               </div>
               <div className="flex flex-col">
-                {/* Handle assignedTo as a string */}
                 {task.assignedTo ? (
-                  <p className="text-gray-300">
+                  <div className="text-gray-300">
                     {task.status === "done" ? (
                       <p className="text-white flex flex-col">
                         Done by{" "}
@@ -82,12 +133,12 @@ const Tasks = ({ tasks = [], loading }) => {
                     ) : (
                       <p className="text-white flex flex-col">
                         Assigned to{" "}
-                        <span className="text-gray-300 font-semibold text-[22px]">
+                        <span className="text-gray-300  text-[20px]">
                           {task.assignedTo.substring(0, 10)}
                         </span>
                       </p>
                     )}
-                  </p>
+                  </div>
                 ) : (
                   <p className="text-gray-300">No assignee</p>
                 )}
@@ -104,7 +155,7 @@ const Tasks = ({ tasks = [], loading }) => {
         <TaskDetailsModal
           task={selectedTask}
           onUpdateStatus={handleUpdateStatus}
-          onclose={closeModal}
+          onClose={closeModal}
           onDelete={handleDeleteTask}
         />
       )}

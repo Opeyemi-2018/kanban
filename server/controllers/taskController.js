@@ -1,10 +1,75 @@
 import { Task } from "../models/taskModel.js";
 import { errorHandler } from "../utils/error.js";
 import nodemailer from "nodemailer";
+import cron from "node-cron";
 
+const sendQueryMail = async (task) => {
+  const transporter = nodemailer.createTransport({
+    host: "smtp.gmail.com",
+    port: 587,
+    secure: false,
+    service: "gmail",
+    auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
+  });
+
+  const mailOptions = {
+    from: process.env.EMAIL_USER,
+    to: task.assignedTo, // This should be a valid email
+    subject: `Task "${task.title}" - Due Date Missed`,
+    text: `Dear ${task.assignedTo},\n\nWe regret to inform you that the task "${task.title}" was due on ${task.dueDate} but has not been completed yet.\n\nTask Description: ${task.description}\n\nPlease review the task and get back to us as soon as possible.\n\nBest regards,\nThe Task Management Team`,
+  };
+
+  await transporter.sendMail(mailOptions);
+};
+
+// Cron job to check overdue tasks every minute
+cron.schedule("* * * * *", async () => {
+  try {
+    const now = new Date();
+    now.setHours(0, 0, 0, 0); // Reset time to 00:00 to avoid unnecessary comparison
+    const overdueTasks = await Task.find({
+      dueDate: { $lt: now },
+      status: { $ne: "done" }, // Only get tasks that are not marked as "done"
+    });
+
+    console.log(`Found ${overdueTasks.length} overdue tasks.`);
+
+    for (const task of overdueTasks) {
+      try {
+        if (!task.emailSent) {
+          await sendQueryMail(task);
+          task.emailSent = true; // Flag that email has been sent
+          await task.save();
+          console.log(`Email sent to ${task.assignedTo}`);
+        }
+      } catch (emailError) {
+        console.error(`Error sending email for task ${task._id}:`, emailError);
+      }
+    }
+
+    console.log("Sack letter emails sent for overdue tasks.");
+  } catch (error) {
+    console.error("Error fetching overdue tasks:", error);
+  }
+});
+// Create new task
 export const createTask = async (req, res, next) => {
-  const { title, description, subtasks, category, assignedTo } = req.body;
-  if (!title || !description || !subtasks || !category || !assignedTo) {
+  const {
+    title,
+    description,
+    subtasks,
+    category,
+    assignedTo,
+    dueDate,
+  } = req.body;
+  if (
+    !title ||
+    !description ||
+    !subtasks ||
+    !category ||
+    !assignedTo ||
+    !dueDate
+  ) {
     return next(errorHandler("all fields are required", 400));
   }
   if (!req.user.isAdmin) {
@@ -17,7 +82,9 @@ export const createTask = async (req, res, next) => {
       subtasks,
       category,
       assignedTo,
+      dueDate,
     });
+
     const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
       port: 587,
@@ -25,12 +92,14 @@ export const createTask = async (req, res, next) => {
       service: "gmail",
       auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
     });
+
     const mailOption = {
       from: process.env.EMAIL_USER,
       to: assignedTo,
       subject: "New task assign",
       text: `You have been assigned a new task: "${title}".\n\nDescription: ${description}\n\nTo start working on this task, please sign up on our homepage:\n${process.env.FRONTEND_URL}/signup\n\nOnce you sign up, you will be able to access and manage your tasks.\n\nBest regards,\nThe Task Management Team`,
     };
+
     await transporter.sendMail(mailOption);
     res.status(201).json({ message: "task successfully created", newTask });
   } catch (error) {
@@ -38,6 +107,7 @@ export const createTask = async (req, res, next) => {
   }
 };
 
+// Get all tasks
 export const getTask = async (req, res, next) => {
   try {
     const task = await Task.find().populate("assignedTo", "name email").exec();
@@ -47,6 +117,7 @@ export const getTask = async (req, res, next) => {
   }
 };
 
+// Get specific task information
 export const getTaskInfo = async (req, res, next) => {
   const { id } = req.param;
   try {
@@ -94,7 +165,6 @@ export const deleteTask = async (req, res, next) => {
     }
   } catch (error) {
     console.log(error);
-
     next(error);
   }
 };

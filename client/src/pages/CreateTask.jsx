@@ -14,6 +14,7 @@ const CreateTask = () => {
     assignedTo: "",
     subtasks: [],
     category: "",
+    dueDate: "",
   });
 
   const handleChange = (e) => {
@@ -30,7 +31,7 @@ const CreateTask = () => {
   const addSubtask = () => {
     setFormData({
       ...formData,
-      subtasks: [...formData.subtasks, { name: "", completed: false }], // Add new subtask
+      subtasks: [...formData.subtasks, { name: "", completed: false }],
     });
   };
 
@@ -47,50 +48,78 @@ const CreateTask = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { description, title, assignedTo, category, subtasks } = formData;
+    const {
+      description,
+      title,
+      assignedTo,
+      category,
+      subtasks,
+      dueDate,
+    } = formData;
+
+    // Validate form fields
     if (!description || !title || !assignedTo || !category) {
-      setError("all fields are required");
+      setError("All fields are required.");
       setTimeout(() => setError(null), 3000);
       return;
     }
+
+    // Check if all subtasks have valid names
     if (!subtasks.every((subtask) => subtask.name.trim())) {
       setError("Subtasks cannot be empty.");
       setTimeout(() => setError(null), 3000);
       return;
     }
+
+    // Validate and format the due date
+    let formattedDueDate;
+    try {
+      formattedDueDate = new Date(dueDate).toISOString();
+    } catch {
+      setError("Invalid due date format.");
+      setTimeout(() => setError(null), 3000);
+      return;
+    }
+
     try {
       setLoading(true);
+
       const res = await fetch("/api/task/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ ...formData, dueDate: formattedDueDate }),
       });
+
       if (!res.ok) {
         const errorData = await res.json();
-        throw new Error(errorData?.message || "something went wrong");
-      } else {
-        navigate("/dashboard");
+        throw new Error(errorData?.message || "Something went wrong");
       }
+
+      navigate("/dashboard");
     } catch (error) {
       setError(error.message);
     } finally {
       setLoading(false);
     }
+
     setFormData({
       description: "",
       title: "",
       assignedTo: "",
       category: "",
       subtasks: [],
+      dueDate: "",
     });
   };
+
   const handleGoBack = () => {
     navigate(-1);
   };
+
   return (
-    <div className="max-w-xl mx-auto pX-5 pt-10    rounded-md ">
+    <div className="max-w-xl mx-auto px-5 pt-10 rounded-md">
       <button
-        className="py-6 flex items-end gap-2 text-gray-600"
+        className="py-6 flex items-center gap-2 text-gray-600"
         onClick={handleGoBack}
       >
         <IoIosArrowBack size={25} /> Go back
@@ -103,7 +132,7 @@ const CreateTask = () => {
             id="title"
             value={formData.title}
             onChange={handleChange}
-            placeholder="enter task name"
+            placeholder="Enter task name"
             required
             className="w-full text-gray-700 border border-gray-500 p-2 rounded mb-4 focus:outline-none"
           />
@@ -112,33 +141,33 @@ const CreateTask = () => {
           <label>Description</label>
           <textarea
             id="description"
-            placeholder="enter task description"
+            placeholder="Enter task description"
             required
             value={formData.description}
             onChange={handleChange}
             className="w-full text-gray-700 border p-2 rounded border-gray-500 mb-4 focus:outline-none"
           ></textarea>
         </div>
-
+        <div>
+          <label>Due Date</label>
+          <input
+            type="datetime-local"
+            id="dueDate"
+            value={formData.dueDate}
+            onChange={handleChange}
+            required
+            className="w-full text-gray-700 border p-2 rounded border-gray-500 mb-4 focus:outline-none"
+          />
+        </div>
         <div>
           <label className="block mb-2">Subtasks</label>
           {formData.subtasks.map((subtask, index) => (
-            <div
-              key={index}
-              className="flex items-center gap-2 mb-2
-            "
-            >
+            <div key={index} className="flex items-center gap-2 mb-2">
               <input
                 type="text"
                 value={subtask.name}
-                onChange={(e) => handleSubtaskChange(index, e.target.value)} // Update subtask name
+                onChange={(e) => handleSubtaskChange(index, e.target.value)}
                 className="w-full text-gray-700 border p-2 border-gray-500 rounded focus:outline-none"
-              />{" "}
-              <input
-                type="checkbox"
-                checked={subtask.completed}
-                onChange={() => toggleSubtaskCompleted(index)} // Toggle subtask completion
-                className="cursor-pointer hidden"
               />
               <button
                 type="button"
@@ -149,11 +178,10 @@ const CreateTask = () => {
               </button>
             </div>
           ))}
-
           <button
             type="button"
             onClick={addSubtask}
-            className="bg-gray-600 border-gray-500 text-white py-1 px-2 mb-2 rounded-md "
+            className="bg-gray-600 border-gray-500 text-white py-1 px-2 mb-2 rounded-md"
           >
             + Add Subtask
           </button>
@@ -181,7 +209,7 @@ const CreateTask = () => {
             type="submit"
             className="px-4 py-2 bg-purple-700 text-white rounded"
           >
-            {loading ? "creating ...." : "Create task"}
+            {loading ? "Creating ..." : "Create Task"}
           </button>
         </div>
       </form>
@@ -194,7 +222,7 @@ const CreateTask = () => {
             <LiaTimesSolid
               size={20}
               onClick={() => setError(null)}
-              className="  cursor-pointer"
+              className="cursor-pointer"
             />
           </div>
         </div>

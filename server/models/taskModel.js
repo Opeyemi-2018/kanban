@@ -13,6 +13,8 @@ const taskSchema = new mongoose.Schema(
     category: { type: String, required: true },
     status: { type: String, enum: ["todo", "doing", "done"], default: "todo" },
     assignedTo: { type: String, required: true },
+    dueDate: { type: Date, required: true },
+    emailSent: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

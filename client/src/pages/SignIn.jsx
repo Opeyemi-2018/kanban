@@ -32,6 +32,7 @@ const SignIn = () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
+        credentials: "include",
       });
       if (!res.ok) {
         const errorData = await res.json();
@@ -39,10 +40,11 @@ const SignIn = () => {
       }
       const data = await res.json();
       if (data._id) {
+        sessionStorage.setItem("access_token", res.headers.get("access_token"));
         getUser(data);
         navigate("/dashboard");
       } else {
-        setError("unable to retrieve data");
+        setError("Unable to retrieve data");
         setTimeout(() => setError(null), 3000);
       }
     } catch (error) {

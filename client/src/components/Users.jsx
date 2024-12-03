@@ -50,12 +50,17 @@ const Users = () => {
     setShowWarning(false);
     setUserToDelete(null);
   };
+
   return (
     <div className=" bg-gray-100 p-6">
       <h1 className="text-2xl text-gray-700 capitalize font-bold">
         team member
       </h1>
-      {users.length > 0 ? (
+      {loading ? (
+        <div className="flex flex-col  items-center justify-center flex-grow">
+          <div className="h-8 w-8 rounded-full animate-ping bg-[#2B2C37]"></div>
+        </div>
+      ) : users.length > 0 ? (
         <div className="flex flex-col">
           {users.map((user) => (
             <div

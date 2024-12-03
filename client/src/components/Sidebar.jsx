@@ -105,7 +105,7 @@ const Sidebar = () => {
           </div>
         </div>
         <div className="w-[600px] pt-10">
-          <Task tasks={filteredTasks} loading={loading} />
+          <Task tasks={filteredTasks} loading={loading} setTasks={setTasks} />
         </div>
         <div className="pt-10 w-[400px]">
           <Users />
