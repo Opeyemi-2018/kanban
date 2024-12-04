@@ -117,7 +117,7 @@ const CreateTask = () => {
   };
 
   return (
-    <div className="max-w-xl mx-auto px-5 pt-10 rounded-md">
+    <div className="max-w-xl mx-auto px-5 py-5 rounded-md">
       <button
         className="py-6 flex items-center gap-2 text-gray-600"
         onClick={handleGoBack}
@@ -209,7 +209,7 @@ const CreateTask = () => {
             type="submit"
             className="px-4 py-2 bg-purple-700 text-white rounded"
           >
-            {loading ? "Creating ..." : "Create Task"}
+            {loading ? "Creating task......" : "Create Task"}
           </button>
         </div>
       </form>

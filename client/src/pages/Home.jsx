@@ -6,7 +6,7 @@ import { GlobalData } from "../context";
 const Home = () => {
   const { activeUser } = useContext(GlobalData);
   const [loading, setLoading] = useState(true);
-  setTimeout(() => setLoading(false), 3000);
+  setTimeout(() => setLoading(false), 500);
 
   return (
     <div className="h-screen bg-[#2B2C37] px-3">

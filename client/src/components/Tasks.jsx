@@ -117,23 +117,19 @@ const Tasks = ({ tasks = [], loading, setTasks }) => {
                 </div>
               </div>{" "}
               <div className="flex flex-col">
-                <p>created on </p>
-                <h1>{new Date(task.createdAt).toLocaleDateString()}</h1>
-              </div>
-              <div className="flex flex-col">
                 {task.assignedTo ? (
                   <div className="text-gray-300">
                     {task.status === "done" ? (
                       <p className="text-white flex flex-col">
                         Done by{" "}
-                        <span className="text-gray-300 font-semibold text-[22px]">
+                        <span className="text-gray-300  text-[18px]">
                           {task.assignedTo.substring(0, 10)}
                         </span>
                       </p>
                     ) : (
                       <p className="text-white flex flex-col">
-                        Assigned to{" "}
-                        <span className="text-gray-300  text-[20px]">
+                        <span className="text-[17px]">Assigned to </span>
+                        <span className="text-gray-300  text-[17px]">
                           {task.assignedTo.substring(0, 10)}
                         </span>
                       </p>
