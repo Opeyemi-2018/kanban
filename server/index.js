@@ -6,6 +6,8 @@ import mongoose from "mongoose";
 import authRoute from "./route/authRoute.js";
 import taskRoute from "./route/createTaskRoute.js";
 import userRoute from "./route/userRoute.js";
+import path from "path";
+
 dotenv.config();
 
 const app = express();
@@ -21,6 +23,7 @@ app.use(
     credentials: true,
   })
 );
+const __dirname = path.resolve();
 
 mongoose.connect(process.env.MONGO_URL).then(() => {
   app.listen(5000, () => {
@@ -31,6 +34,12 @@ mongoose.connect(process.env.MONGO_URL).then(() => {
 app.use("/api/auth", authRoute);
 app.use("/api/task", taskRoute);
 app.use("/api/user", userRoute);
+
+app.use(express.static(path.join(__dirname, "/client/dist")));
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "client", "dist", "index.html"));
+});
 
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;
