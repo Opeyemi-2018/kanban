@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { IoIosArrowBack } from "react-icons/io";
 import { LiaTimesSolid } from "react-icons/lia";
-import { MdErrorOutline } from "react-icons/md";
+import { MdErrorOutline, MdMic } from "react-icons/md";
 
 const CreateTask = () => {
   const navigate = useNavigate();
@@ -16,6 +16,56 @@ const CreateTask = () => {
     category: "",
     dueDate: "",
   });
+
+  const handleSpeechInput = (inputId) => {
+    if (!window.SpeechRecognition && !window.webkitSpeechRecognition) {
+      setError("Speech recognition not supported in this browser.");
+      setTimeout(() => setError(null), 3000);
+      return;
+    }
+
+    const SpeechRecognition =
+      window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+
+    recognition.onresult = (event) => {
+      const speechText = event.results[0][0].transcript;
+      setFormData((prev) => ({ ...prev, [inputId]: speechText }));
+    };
+
+    recognition.onerror = () => {
+      setError("Error occurred during speech recognition.");
+      setTimeout(() => setError(null), 3000);
+    };
+
+    recognition.start();
+  };
+
+  const handleSubtaskSpeechInput = (index) => {
+    if (!window.SpeechRecognition && !window.webkitSpeechRecognition) {
+      setError("Speech recognition not supported in this browser.");
+      setTimeout(() => setError(null), 3000);
+      return;
+    }
+
+    const SpeechRecognition =
+      window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+
+    recognition.onresult = (event) => {
+      const speechText = event.results[0][0].transcript;
+      const updatedSubtasks = [...formData.subtasks];
+      updatedSubtasks[index].name = speechText;
+      setFormData({ ...formData, subtasks: updatedSubtasks });
+    };
+
+    recognition.onerror = () => {
+      setError("Error occurred during speech recognition.");
+      setTimeout(() => setError(null), 3000);
+    };
+
+    recognition.start();
+  };
 
   const handleChange = (e) => {
     const { id, value } = e.target;
@@ -37,12 +87,6 @@ const CreateTask = () => {
 
   const removeSubtask = (index) => {
     const updatedSubtasks = formData.subtasks.filter((_, i) => i !== index);
-    setFormData({ ...formData, subtasks: updatedSubtasks });
-  };
-
-  const toggleSubtaskCompleted = (index) => {
-    const updatedSubtasks = [...formData.subtasks];
-    updatedSubtasks[index].completed = !updatedSubtasks[index].completed;
     setFormData({ ...formData, subtasks: updatedSubtasks });
   };
 
@@ -127,37 +171,58 @@ const CreateTask = () => {
       <form onSubmit={handleSubmit}>
         <div>
           <label>Title</label>
-          <input
-            type="text"
-            id="title"
-            value={formData.title}
-            onChange={handleChange}
-            placeholder="Enter task name"
-            required
-            className="w-full text-gray-700 border border-gray-500 p-2 rounded mb-4 focus:outline-none"
-          />
+          <div className="flex items-center gap-2">
+            <input
+              type="text"
+              id="title"
+              value={formData.title}
+              onChange={handleChange}
+              placeholder="Enter task name"
+              required
+              className="w-full text-gray-700 border border-gray-500 p-2 rounded mb-4 focus:outline-none"
+            />
+            <MdMic
+              size={25}
+              className="cursor-pointer text-gray-600"
+              onClick={() => handleSpeechInput("title")}
+            />
+          </div>
         </div>
         <div>
           <label>Description</label>
-          <textarea
-            id="description"
-            placeholder="Enter task description"
-            required
-            value={formData.description}
-            onChange={handleChange}
-            className="w-full text-gray-700 border p-2 rounded border-gray-500 mb-4 focus:outline-none"
-          ></textarea>
+          <div className="flex items-center gap-2">
+            <textarea
+              id="description"
+              placeholder="Enter task description"
+              required
+              value={formData.description}
+              onChange={handleChange}
+              className="w-full text-gray-700 border p-2 rounded border-gray-500 mb-4 focus:outline-none"
+            ></textarea>
+            <MdMic
+              size={25}
+              className="cursor-pointer text-gray-600"
+              onClick={() => handleSpeechInput("description")}
+            />
+          </div>
         </div>
         <div>
           <label>Due Date</label>
-          <input
-            type="datetime-local"
-            id="dueDate"
-            value={formData.dueDate}
-            onChange={handleChange}
-            required
-            className="w-full text-gray-700 border p-2 rounded border-gray-500 mb-4 focus:outline-none"
-          />
+          <div className="flex items-center gap-2">
+            <input
+              type="datetime-local"
+              id="dueDate"
+              value={formData.dueDate}
+              onChange={handleChange}
+              required
+              className="w-full text-gray-700 border p-2 rounded border-gray-500 mb-4 focus:outline-none"
+            />
+            <MdMic
+              size={25}
+              className="cursor-pointer text-gray-600"
+              onClick={() => handleSpeechInput("dueDate")}
+            />
+          </div>
         </div>
         <div>
           <label className="block mb-2">Subtasks</label>
@@ -168,6 +233,11 @@ const CreateTask = () => {
                 value={subtask.name}
                 onChange={(e) => handleSubtaskChange(index, e.target.value)}
                 className="w-full text-gray-700 border p-2 border-gray-500 rounded focus:outline-none"
+              />
+              <MdMic
+                size={25}
+                className="cursor-pointer text-gray-600"
+                onClick={() => handleSubtaskSpeechInput(index)}
               />
               <button
                 type="button"
@@ -186,23 +256,43 @@ const CreateTask = () => {
             + Add Subtask
           </button>
         </div>
-        <input
-          type="text"
-          id="category"
-          placeholder="Category"
-          value={formData.category}
-          onChange={handleChange}
-          className="w-full border text-gray-700 p-2 border-gray-500 rounded mb-4 focus:outline-none"
-        />
-        <input
-          type="email"
-          id="assignedTo"
-          placeholder="Assignee Email"
-          value={formData.assignedTo}
-          onChange={handleChange}
-          className="w-full text-gray-700 border p-2 border-gray-500 rounded mb-4 focus:outline-none"
-          required
-        />
+        <div>
+          <label>Category</label>
+          <div className="flex items-center gap-2">
+            <input
+              type="text"
+              id="category"
+              placeholder="Category"
+              value={formData.category}
+              onChange={handleChange}
+              className="w-full border text-gray-700 p-2 border-gray-500 rounded mb-4 focus:outline-none"
+            />
+            <MdMic
+              size={25}
+              className="cursor-pointer text-gray-600"
+              onClick={() => handleSpeechInput("category")}
+            />
+          </div>
+        </div>
+        <div>
+          <label>Assignee Email</label>
+          <div className="flex items-center gap-2">
+            <input
+              type="email"
+              id="assignedTo"
+              placeholder="Assignee Email"
+              value={formData.assignedTo}
+              onChange={handleChange}
+              required
+              className="w-full text-gray-700 border p-2 border-gray-500 rounded mb-4 focus:outline-none"
+            />
+            <MdMic
+              size={25}
+              className="cursor-pointer text-gray-600"
+              onClick={() => handleSpeechInput("assignedTo")}
+            />
+          </div>
+        </div>
         <div className="flex justify-end gap-4">
           <button
             disabled={loading}
