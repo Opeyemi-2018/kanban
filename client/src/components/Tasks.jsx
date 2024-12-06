@@ -86,57 +86,59 @@ const Tasks = ({ tasks = [], loading, setTasks }) => {
           const overdue = isTaskOverdue(task.dueDate);
           const taskBgClass =
             task.status === "done"
-              ? "bg-[#2B2C37]" // No change when done
+              ? "border border-gray-500" // No change when done
               : overdue
-              ? "bg-red-600 animate-pulse" // Red fading effect when overdue
-              : "bg-[#2B2C37]"; // Default background
+              ? "border-red-600 border animate-pulse"
+              : "border border-gray-500";
 
           return (
             <div
               onClick={() => handleTaskClick(task)}
               key={task._id}
-              className={`py-3 px-5 flex justify-between cursor-pointer rounded-md text-white my-3 ${taskBgClass}`}
+              className={`py-3 px-5 flex justify-between cursor-pointer rounded-md text-gray-700 my-3 ${taskBgClass}`}
             >
               <div className="flex items-center gap-10">
                 <div>
                   {task.status === "done" ? (
-                    <span className="text-green bg-green-500 rounded-full p-1 inline-block mr-2">
+                    <span className="text-white bg-green-500 rounded-full p-1 inline-block mr-2">
                       <MdOutlineDone size={25} />
                     </span>
                   ) : (
-                    <span className="text-green bg-red-500 rounded-full p-1 inline-block mr-2">
+                    <span className="text-white bg-red-500 rounded-full p-1 inline-block mr-2">
                       <MdOutlinePending size={25} />
                     </span>
                   )}
                 </div>
                 <div>
                   <h1 className="font-semibold ">{task.title}</h1>
-                  <p className="text-gray-300">
+                  <p className="text-gray-700">
                     {task.subtasks.length} subtasks
                   </p>
                 </div>
               </div>{" "}
               <div className="flex flex-col">
                 {task.assignedTo ? (
-                  <div className="text-gray-300">
+                  <div className="text-gray-700">
                     {task.status === "done" ? (
-                      <p className="text-white flex flex-col">
+                      <p className="text-gray-700 flex flex-col">
                         Done by{" "}
-                        <span className="text-gray-300  text-[18px]">
+                        <span className="text-gray-700  text-[18px]">
                           {task.assignedTo.substring(0, 10)}
                         </span>
                       </p>
                     ) : (
                       <p className="text-white flex flex-col">
-                        <span className="text-[17px]">Assigned to </span>
-                        <span className="text-gray-300  text-[17px]">
+                        <span className="text-[17px] text-gray-700">
+                          Assigned to{" "}
+                        </span>
+                        <span className="text-gray-700  text-[17px]">
                           {task.assignedTo.substring(0, 10)}
                         </span>
                       </p>
                     )}
                   </div>
                 ) : (
-                  <p className="text-gray-300">No assignee</p>
+                  <p className="text-gray-700">No assignee</p>
                 )}
               </div>
             </div>

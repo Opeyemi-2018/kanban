@@ -46,7 +46,7 @@ export const createTask = async (req, res, next) => {
       from: process.env.EMAIL_USER,
       to: assignedTo,
       subject: "New task assign",
-      text: `You have been assigned a new task: "${title}".\n\nDescription: ${description}\n\nTo start working on this task, please sign up on our homepage:\n${process.env.FRONTEND_URL}/signup\n\nOnce you sign up, you will be able to access and manage your tasks.\n\nBest regards,\nThe Task Management Team`,
+      text: `You have been assigned a new task: "${title}".\n\nDescription: ${description}\n\nTo start working on this task, please sign up on our homepage:\n${process.env.FRONTEND_URL}\n\nOnce you sign up, you will be able to access and manage your tasks.\n\nBest regards,\nThe Task Management Team`,
     };
 
     await transporter.sendMail(mailOption);

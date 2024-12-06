@@ -7,6 +7,7 @@ import authRoute from "./route/authRoute.js";
 import taskRoute from "./route/createTaskRoute.js";
 import userRoute from "./route/userRoute.js";
 import path from "path";
+// import commentRoute from "./route/commentRoute.js";
 
 dotenv.config();
 
@@ -34,6 +35,7 @@ mongoose.connect(process.env.MONGO_URL).then(() => {
 app.use("/api/auth", authRoute);
 app.use("/api/task", taskRoute);
 app.use("/api/user", userRoute);
+// app.use("/api/comment", commentRoute);
 
 app.use(express.static(path.join(__dirname, "/client/dist")));
 
